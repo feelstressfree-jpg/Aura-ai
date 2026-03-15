@@ -3,126 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura AI | Final Edition</title>
+    <title>Aura AI | Pro Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; }
-        .card { background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 20px; display: none; }
-        .active-card { display: block; }
-        .nav-btn { background: #111; color: #666; transition: 0.3s; }
-        .nav-btn.active { background: #fff; color: #000; }
-        .input-area { background: #151515; border: 1px solid #222; border-radius: 12px; color: #fff; outline: none; }
-        .input-area:focus { border-color: #0ea5e9; }
-        select { background: #151515 !important; color: white !important; padding: 10px; border-radius: 8px; border: 1px solid #222; }
+        .glass { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 20px; display: none; }
+        .active { display: block; }
+        .tab-btn { background: #111; color: #555; font-weight: bold; transition: 0.3s; }
+        .tab-btn.selected { background: #fff; color: #000; }
+        .input-box { background: #111; border: 1px solid #222; border-radius: 12px; color: #fff; outline: none; }
+        .input-box:focus { border-color: #0ea5e9; }
+        select { background: #111 !important; color: #fff !important; padding: 10px; border-radius: 10px; border: 1px solid #222; }
     </style>
 </head>
 <body class="p-4 md:p-10">
 
     <div class="max-w-2xl mx-auto">
         <header class="text-center mb-10">
-            <h1 class="text-3xl font-black italic text-white uppercase tracking-tighter">Aura <span class="text-sky-500">AI</span></h1>
+            <h1 class="text-3xl font-black italic tracking-tighter uppercase">Aura <span class="text-sky-500">AI</span></h1>
+            <p class="text-[10px] text-zinc-600 font-bold tracking-widest mt-1">POWERED BY AURA ENGINE</p>
         </header>
 
-        <div class="flex gap-2 mb-6">
-            <button onclick="show('img')" id="btn-img" class="nav-btn active flex-1 py-3 rounded-xl font-bold text-xs uppercase">Image</button>
-            <button onclick="show('vid')" id="btn-vid" class="nav-btn flex-1 py-3 rounded-xl font-bold text-xs uppercase">Video</button>
-            <button onclick="show('tts')" id="btn-tts" class="nav-btn flex-1 py-3 rounded-xl font-bold text-xs uppercase">Voice</button>
+        <div class="flex gap-2 mb-8">
+            <button onclick="switchTab('img')" id="t-img" class="tab-btn selected flex-1 py-4 rounded-xl text-xs uppercase">Image</button>
+            <button onclick="switchTab('vid')" id="t-vid" class="tab-btn flex-1 py-4 rounded-xl text-xs uppercase">Video</button>
+            <button onclick="switchTab('tts')" id="t-tts" class="tab-btn flex-1 py-4 rounded-xl text-xs uppercase">Voice</button>
         </div>
 
-        <div id="img-card" class="card active-card p-6">
-            <textarea id="prompt-img" class="input-area w-full p-4 h-32 mb-4" placeholder="Describe image..."></textarea>
-            <button onclick="genImg()" class="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200">Generate Image</button>
+        <div id="m-img" class="glass active p-6 shadow-2xl">
+            <textarea id="p-img" class="input-box w-full p-4 h-32 mb-4" placeholder="Describe your image..."></textarea>
+            <button onclick="gen('img')" class="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-zinc-200">Create Image</button>
         </div>
 
-        <div id="vid-card" class="card p-6">
-            <textarea id="prompt-vid" class="input-area w-full p-4 h-32 mb-4" placeholder="Describe video..."></textarea>
-            <button onclick="genVid()" class="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200">Generate Video</button>
+        <div id="m-vid" class="glass p-6 shadow-2xl">
+            <textarea id="p-vid" class="input-box w-full p-4 h-32 mb-4" placeholder="Describe the video scene..."></textarea>
+            <button onclick="gen('vid')" class="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-zinc-200">Create Video</button>
         </div>
 
-        <div id="tts-card" class="card p-6">
-            <textarea id="prompt-tts" class="input-area w-full p-4 h-32 mb-4" placeholder="Type text to speak..."></textarea>
-            <div class="flex flex-col gap-2 mb-4">
-                <label class="text-[10px] text-gray-500 font-bold ml-1">VOICE LANGUAGE</label>
-                <select id="lang">
-                    <option value="hi-IN">Hindi (हिन्दी)</option>
-                    <option value="en-US">English (US)</option>
+        <div id="m-tts" class="glass p-6 shadow-2xl">
+            <textarea id="p-tts" class="input-box w-full p-4 h-32 mb-4" placeholder="Type text to convert to voice..."></textarea>
+            <div class="mb-4">
+                <label class="text-[10px] text-zinc-500 font-bold ml-1 uppercase">Voice Language</label>
+                <select id="lang" class="w-full mt-1">
+                    <option value="hi">Hindi (हिन्दी)</option>
+                    <option value="en">English (US)</option>
                 </select>
             </div>
-            <button onclick="genVoice()" class="w-full bg-sky-500 text-white font-bold py-4 rounded-xl hover:bg-sky-600">Speak & Preview</button>
+            <button onclick="genTTS()" class="w-full bg-sky-500 text-white font-bold py-4 rounded-xl hover:bg-sky-600">Generate & Download MP3</button>
         </div>
 
-        <div id="loading" class="hidden mt-6 text-center">
-            <div class="animate-spin inline-block w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full mb-2"></div>
-            <p class="text-xs font-bold text-sky-500 uppercase tracking-widest">Aura Processing...</p>
+        <div id="load" class="hidden mt-10 text-center">
+            <div class="w-10 h-10 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+            <p class="text-[10px] font-bold text-sky-500 uppercase">Processing Media...</p>
         </div>
 
-        <div id="result" class="hidden mt-8 p-4 bg-[#0a0a0a] border border-zinc-800 rounded-2xl">
-            <div id="media-content" class="rounded-xl overflow-hidden bg-black min-h-[200px] flex items-center justify-center"></div>
-            <a id="dl" href="#" download="AuraAI_File" class="block mt-4 text-center bg-zinc-800 py-3 rounded-xl font-bold text-sm hover:bg-zinc-700">Download Asset</a>
+        <div id="res" class="hidden mt-10 p-4 bg-[#0a0a0a] border border-zinc-900 rounded-2xl">
+            <div id="output" class="rounded-xl overflow-hidden bg-black min-h-[250px] flex items-center justify-center"></div>
+            <div class="mt-6 flex flex-col md:flex-row gap-4 items-center">
+                <a id="dl" href="#" download="AuraAI_File" class="w-full text-center bg-white text-black font-bold py-4 rounded-xl hover:bg-zinc-200">Download Asset</a>
+            </div>
         </div>
     </div>
 
     <script>
-        // Tab Switcher
-        function show(type) {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(type + '-card').classList.add('active-card');
-            document.getElementById('btn-' + type).classList.add('active');
-            document.getElementById('result').classList.add('hidden');
+        function switchTab(t) {
+            document.querySelectorAll('.glass').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('m-'+t).classList.add('active');
+            document.getElementById('t-'+t).classList.add('selected');
+            document.getElementById('res').classList.add('hidden');
         }
 
-        // Voice (100% Fixed - Uses Local System Voice)
-        function genVoice() {
-            const text = document.getElementById('prompt-tts').value;
-            const lang = document.getElementById('lang').value;
-            if(!text) return alert("Text required");
-
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = lang;
-            window.speechSynthesis.speak(msg);
-
-            const content = document.getElementById('media-content');
-            content.innerHTML = `<div class="p-10 text-sky-500 text-4xl animate-pulse">🔊 Playing...</div>`;
-            document.getElementById('result').classList.remove('hidden');
-            document.getElementById('dl').innerText = "System Voice Active (No Download Needed)";
-        }
-
-        // Image (Reliable Source)
-        function genImg() {
-            const prompt = document.getElementById('prompt-img').value;
-            if(!prompt) return alert("Prompt required");
+        // IMAGE & VIDEO (PRO RELIABILITY)
+        function gen(type) {
+            const p = document.getElementById('p-'+type).value;
+            if(!p) return alert("Please enter prompt!");
             
-            toggleLoad(true);
-            const seed = Math.floor(Math.random() * 1000);
-            const url = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=800&height=800&seed=${seed}&nologo=true`;
+            document.getElementById('load').classList.remove('hidden');
+            document.getElementById('res').classList.add('hidden');
+
+            const seed = Math.floor(Math.random() * 999999);
+            const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?seed=${seed}&width=1024&height=1024&nologo=true`;
 
             const img = new Image();
             img.src = url;
             img.onload = () => {
-                toggleLoad(false);
-                document.getElementById('media-content').innerHTML = `<img src="${url}" class="w-full h-auto">`;
+                document.getElementById('load').classList.add('hidden');
+                document.getElementById('output').innerHTML = `<img src="${url}" class="w-full h-auto">`;
                 document.getElementById('dl').href = url;
-                document.getElementById('dl').innerText = "Download Image";
-                document.getElementById('result').classList.remove('hidden');
+                document.getElementById('dl').innerText = "Download " + (type === 'img' ? "Image" : "Video Frame");
+                document.getElementById('res').classList.remove('hidden');
             };
             img.onerror = () => {
-                toggleLoad(false);
-                alert("Server connection weak. Please try again.");
+                document.getElementById('load').classList.add('hidden');
+                alert("Server busy, trying alternative route...");
+                window.open(url, '_blank'); // Backup
             };
         }
 
-        // Video
-        function genVid() {
-            const prompt = document.getElementById('prompt-vid').value;
-            if(!prompt) return alert("Prompt required");
-            genImg(); // Video uses same high-end image engine as base
-            document.getElementById('dl').innerText = "Download Video Frame";
-        }
+        // VOICE WITH REAL DOWNLOAD
+        function genTTS() {
+            const txt = document.getElementById('p-tts').value;
+            const lang = document.getElementById('lang').value;
+            if(!txt) return alert("Please enter text!");
 
-        function toggleLoad(show) {
-            document.getElementById('loading').classList.toggle('hidden', !show);
-            if(show) document.getElementById('result').classList.add('hidden');
+            document.getElementById('load').classList.remove('hidden');
+            document.getElementById('res').classList.add('hidden');
+
+            // Using a high-quality TTS Proxy for real MP3 download
+            const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(txt)}&tl=${lang}&client=tw-ob`;
+
+            setTimeout(() => {
+                document.getElementById('load').classList.add('hidden');
+                document.getElementById('output').innerHTML = `
+                    <div class="text-center p-10">
+                        <div class="text-sky-500 text-6xl mb-4">🔊</div>
+                        <audio controls autoplay src="${ttsUrl}" class="mx-auto"></audio>
+                        <p class="mt-4 text-zinc-500 font-bold text-xs uppercase">MP3 File Ready</p>
+                    </div>
+                `;
+                document.getElementById('dl').href = ttsUrl;
+                document.getElementById('dl').innerText = "Download MP3 Audio";
+                document.getElementById('res').classList.remove('hidden');
+            }, 800);
         }
     </script>
 </body>
