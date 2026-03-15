@@ -3,165 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura AI | Universal Media Engine</title>
+    <title>Aura AI | Multi-Media Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f8fafc; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .accent-gradient { background: linear-gradient(135deg, #38bdf8, #818cf8); }
-        .btn-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .btn-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(56, 189, 248, 0.5); }
-        #progressBar { transition: width 0.5s ease-in-out; }
+        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; }
+        .glass-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 24px; }
+        .input-box { background: #111; border: 1px solid #222; border-radius: 16px; color: white; outline: none; transition: 0.3s; }
+        .input-box:focus { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.1); }
+        select option { background: #111; color: white; padding: 10px; } /* Fixed visibility */
+        .loader-line { height: 3px; width: 0%; background: #38bdf8; transition: width 0.4s ease; border-radius: 10px; }
+        .btn-primary { background: #fff; color: #000; font-weight: 700; transition: 0.3s; }
+        .btn-primary:hover { background: #e2e2e2; transform: scale(1.02); }
+        .btn-secondary { background: #111; border: 1px solid #222; transition: 0.3s; }
+        .btn-secondary:hover { background: #1a1a1a; }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="p-4 md:p-8">
 
-    <nav class="p-5 border-b border-white/5 flex justify-between items-center glass sticky top-0 z-50">
-        <div class="text-2xl font-black tracking-tighter text-white">AURA<span class="text-sky-400 italic">AI</span></div>
-        <div class="flex items-center gap-2">
-            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">System Online</span>
-        </div>
+    <nav class="max-w-5xl mx-auto flex justify-between items-center mb-12">
+        <div class="text-2xl font-black tracking-tighter">AURA<span class="text-sky-500 italic">AI</span></div>
+        <div class="text-[10px] border border-white/20 px-3 py-1 rounded-full text-gray-400 font-bold uppercase tracking-widest">v3.5 Stable</div>
     </nav>
 
-    <main class="max-w-5xl mx-auto p-6 pt-12">
-        <div class="text-center mb-10">
-            <h1 class="text-5xl font-extrabold mb-4">Global Creative <span class="text-sky-400">Studio</span></h1>
-            <p class="text-gray-400">Generate high-quality images, videos, and voices in any language.</p>
-        </div>
-
-        <div class="glass p-8 rounded-[2rem] mb-10 shadow-2xl">
-            <textarea id="promptInput" rows="3" class="w-full bg-transparent border-none outline-none text-xl placeholder-gray-600 mb-6 resize-none" placeholder="Enter your prompt or text here..."></textarea>
+    <main class="max-w-4xl mx-auto">
+        <div class="glass-card p-6 md:p-10">
+            <h2 class="text-xl font-semibold mb-6 text-gray-400">What are we creating today?</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold uppercase text-gray-500 ml-2">Speech Language</label>
-                    <select id="langSelect" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm cursor-pointer focus:border-sky-500">
-                        <option value="hi-IN">Hindi (हिन्दी)</option>
-                        <option value="en-US" selected>English (US)</option>
-                        <option value="es-ES">Spanish (Español)</option>
-                        <option value="fr-FR">French (Français)</option>
-                        <option value="de-DE">German (Deutsch)</option>
-                        <option value="ja-JP">Japanese (日本語)</option>
+            <textarea id="promptInput" class="input-box w-full p-4 text-lg min-h-[120px] mb-6" placeholder="Describe your image or type text to convert into speech..."></textarea>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Output Language</label>
+                    <select id="langSelect" class="input-box p-3 text-sm cursor-pointer">
+                        <option value="en">English (Global)</option>
+                        <option value="hi">Hindi (हिन्दी)</option>
+                        <option value="es">Spanish (Español)</option>
+                        <option value="fr">French (Français)</option>
+                        <option value="ja">Japanese (日本語)</option>
                     </select>
                 </div>
 
-                <button onclick="generateMedia('image')" class="btn-hover accent-gradient text-white font-bold p-3 rounded-xl text-sm h-[48px]">Create Image</button>
-                <button onclick="generateMedia('video')" class="btn-hover bg-white/10 border border-white/10 font-bold p-3 rounded-xl text-sm h-[48px]">Create Video</button>
-                <button onclick="generateSpeech()" class="btn-hover bg-sky-500/20 text-sky-400 border border-sky-500/30 font-bold p-3 rounded-xl text-sm h-[48px]">Gen & Download Audio</button>
+                <div class="md:col-span-2 grid grid-cols-2 gap-3">
+                    <button onclick="generateMedia('image')" id="imgBtn" class="btn-primary p-3 rounded-xl text-sm">Create Image</button>
+                    <button onclick="generateMedia('video')" id="vidBtn" class="btn-secondary p-3 rounded-xl text-sm">Create Video</button>
+                </div>
             </div>
 
-            <div id="progressCont" class="hidden mt-8">
-                <div class="flex justify-between text-[10px] font-bold mb-2 text-gray-500">
-                    <span id="statusLabel">Processing...</span>
-                    <span id="progressPercent">0%</span>
+            <button onclick="generateSpeech()" id="ttsBtn" class="w-full mt-4 bg-sky-500/10 text-sky-400 border border-sky-500/20 p-4 rounded-xl font-bold hover:bg-sky-500/20 transition">
+                Generate & Download Voice (TTS)
+            </button>
+
+            <div id="loaderArea" class="hidden mt-8">
+                <div class="flex justify-between text-[10px] font-bold text-gray-500 mb-2 uppercase">
+                    <span id="loadText">Processing...</span>
+                    <span id="loadPercent">0%</span>
                 </div>
-                <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div id="progressBar" class="h-full accent-gradient w-0"></div>
+                <div class="w-full bg-white/5 rounded-full overflow-hidden">
+                    <div id="loaderBar" class="loader-line"></div>
                 </div>
             </div>
         </div>
 
-        <div id="outputContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="glass p-4 rounded-3xl overflow-hidden">
-                <img id="outputImg" class="w-full h-auto rounded-2xl shadow-xl" src="" alt="Aura AI Result">
-            </div>
-            <div class="glass p-8 rounded-3xl flex flex-col justify-center">
-                <h3 class="text-xl font-bold mb-2">Media Assets</h3>
-                <p class="text-sm text-gray-500 mb-6 italic" id="finalPromptText"></p>
-                <a id="downloadBtn" href="#" download="aura-ai-asset" class="block text-center bg-white text-black font-bold py-4 rounded-2xl btn-hover">Download High-Res Asset</a>
+        <div id="resultArea" class="hidden mt-10">
+            <div class="glass-card overflow-hidden">
+                <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-sky-500">Aura AI Generated Content</span>
+                    <button onclick="location.reload()" class="text-[10px] text-gray-500 hover:text-white uppercase font-bold">Clear All</button>
+                </div>
+                
+                <div class="p-2">
+                    <img id="outputMedia" class="w-full rounded-2xl shadow-2xl h-auto min-h-[200px] bg-[#050505]" src="" alt="Output">
+                </div>
+
+                <div class="p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p id="promptDisplay" class="text-sm text-gray-500 italic max-w-md"></p>
+                    <a id="downLink" href="#" download="AuraAI_Asset" class="bg-white text-black px-8 py-3 rounded-xl font-bold text-sm btn-primary">Download Asset</a>
+                </div>
             </div>
         </div>
     </main>
 
-    <footer class="p-10 text-center border-t border-white/5 mt-20">
-        <p class="text-[10px] font-bold tracking-[0.6em] text-gray-600 uppercase">Aura AI Universal &copy; 2026</p>
+    <footer class="mt-20 text-center pb-10">
+        <p class="text-[10px] tracking-[0.5em] text-gray-700 font-bold uppercase italic">Aura AI Research Studio &copy; 2026</p>
     </footer>
 
     <script>
-        // --- 1. Text to Speech with Download ---
-        async function generateSpeech() {
+        // --- TEXT TO SPEECH (FIXED DOWNLOAD & LANGUAGE) ---
+        function generateSpeech() {
             const text = document.getElementById('promptInput').value;
             const lang = document.getElementById('langSelect').value;
-            if (!text) return alert("Please enter text first!");
+            if(!text) return alert("Write something first!");
 
-            // Using Google Translate TTS Engine (Free & Reliable for Download)
-            const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang.split('-')[0]}&client=tw-ob`;
+            // Using a more reliable TTS endpoint for direct download
+            const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
             
-            // Audio Playback
+            // UI Update
+            const resArea = document.getElementById('resultArea');
+            const outMed = document.getElementById('outputMedia');
+            const dLink = document.getElementById('downLink');
+
+            outMed.src = "https://img.freepik.com/premium-vector/equalizer-wave-background_23-2148117768.jpg"; // Audio Visualizer static
+            dLink.href = ttsUrl;
+            dLink.innerText = "Download MP3 Audio";
+            document.getElementById('promptDisplay').innerText = "Audio ready for download.";
+            
+            resArea.classList.remove('hidden');
             const audio = new Audio(ttsUrl);
             audio.play();
-
-            // Setup Download Link
-            const downloadBtn = document.getElementById('downloadBtn');
-            const outputContainer = document.getElementById('outputContainer');
-            const outputImg = document.getElementById('outputImg');
-
-            outputImg.src = "https://cdn-icons-png.flaticon.com/512/727/727245.png"; // Audio Icon placeholder
-            outputContainer.classList.remove('hidden');
-            downloadBtn.href = ttsUrl;
-            downloadBtn.innerText = "Download Audio File";
             
-            alert("Playing Audio... You can now download it using the button below.");
+            alert("Playing preview... Click 'Download MP3' to save it.");
         }
 
-        // --- 2. Robust Image/Video Generation ---
+        // --- IMAGE & VIDEO GENERATION (ROBUST) ---
         async function generateMedia(type) {
             const prompt = document.getElementById('promptInput').value;
-            if (!prompt) return alert("Please enter a prompt!");
+            if(!prompt) return alert("Prompt empty!");
 
-            const progressCont = document.getElementById('progressCont');
-            const progressBar = document.getElementById('progressBar');
-            const statusLabel = document.getElementById('statusLabel');
-            const progressPercent = document.getElementById('progressPercent');
-            const outputContainer = document.getElementById('outputContainer');
-            const outputImg = document.getElementById('outputImg');
-            const downloadBtn = document.getElementById('downloadBtn');
+            const lBar = document.getElementById('loaderBar');
+            const lArea = document.getElementById('loaderArea');
+            const lText = document.getElementById('loadText');
+            const lPer = document.getElementById('loadPercent');
+            const resArea = document.getElementById('resultArea');
 
             // Reset UI
-            progressCont.classList.remove('hidden');
-            outputContainer.classList.add('hidden');
-            let progress = 0;
+            lArea.classList.remove('hidden');
+            resArea.classList.add('hidden');
+            let p = 0;
 
-            const updateProgress = (p, label) => {
-                progressBar.style.width = p + "%";
-                progressPercent.innerText = p + "%";
-                statusLabel.innerText = label;
+            const update = (val, txt) => {
+                lBar.style.width = val + "%";
+                lPer.innerText = val + "%";
+                lText.innerText = txt;
             };
 
-            updateProgress(20, "Analyzing Language...");
-            
-            const seed = Math.floor(Math.random() * 9999999);
-            // Pollinations with FLUX model (Best for Hindi/Global prompts)
-            const apiUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1080&height=1080&seed=${seed}&model=flux&enhance=${type === 'video'}`;
+            update(15, "Initializing Aura Engine...");
+
+            const seed = Math.floor(Math.random() * 999999);
+            // Stable Flux Model
+            const apiUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${seed}&model=flux&nologo=true`;
 
             try {
-                updateProgress(50, `Generating ${type.toUpperCase()}...`);
+                update(45, type === 'video' ? "Compiling Frames..." : "Painting Pixels...");
                 
-                // Fetch image to ensure it's ready
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error();
+                // Pre-check image
+                const img = new Image();
+                img.src = apiUrl;
+                
+                img.onload = () => {
+                    update(100, "Done!");
+                    setTimeout(() => {
+                        document.getElementById('outputMedia').src = apiUrl;
+                        document.getElementById('downLink').href = apiUrl;
+                        document.getElementById('downLink').innerText = "Download " + type.toUpperCase();
+                        document.getElementById('promptDisplay').innerText = prompt;
+                        
+                        lArea.classList.add('hidden');
+                        resArea.classList.remove('hidden');
+                        window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+                    }, 500);
+                };
 
-                const blob = await response.blob();
-                const objectURL = URL.createObjectURL(blob);
+                img.onerror = () => {
+                    update(0, "API Busy. Retrying in 2 seconds...");
+                    setTimeout(() => generateMedia(type), 2000);
+                };
 
-                updateProgress(100, "Finalizing Asset...");
-
-                setTimeout(() => {
-                    outputImg.src = objectURL;
-                    downloadBtn.href = objectURL;
-                    downloadBtn.innerText = `Download ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-                    document.getElementById('finalPromptText').innerText = `Prompt: ${prompt}`;
-                    
-                    progressCont.classList.add('hidden');
-                    outputContainer.classList.remove('hidden');
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                }, 800);
-
-            } catch (error) {
-                alert("Server busy. Aura Engine is retrying automatically...");
-                setTimeout(() => generateMedia(type), 2000);
+            } catch (e) {
+                console.error(e);
+                alert("Something went wrong. Let's try again.");
             }
         }
     </script>
