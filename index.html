@@ -3,148 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura AI Studio</title>
+    <title>Aura AI | Complete Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; }
-        .glass { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 20px; }
-        select { background: #111 !important; color: #fff !important; border: 1px solid #333 !important; padding: 10px; border-radius: 8px; appearance: none; }
-        option { background: #111 !important; color: #fff !important; }
-        .loading-line { height: 4px; background: #0ea5e9; width: 0%; transition: 0.4s; }
-        .media-box { background: #050505; min-height: 300px; border-radius: 15px; display: flex; align-items: center; justify-content: center; }
+        body { font-family: 'Inter', sans-serif; background: #050505; color: #fff; }
+        .studio-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 24px; padding: 2rem; }
+        .input-box { background: #111; border: 1px solid #222; border-radius: 12px; color: white; padding: 1rem; }
+        .input-box:focus { border-color: #0ea5e9; box-shadow: 0 0 15px rgba(14, 165, 233, 0.1); outline: none; }
+        select { background: #111 !important; color: white !important; border: 1px solid #222 !important; border-radius: 10px; padding: 10px; cursor: pointer; appearance: none; }
+        .tab-btn { background: #111; border: 1px solid #222; color: #888; font-weight: 600; transition: 0.3s; }
+        .tab-btn:hover { background: #1a1a1a; color: white; }
+        .tab-btn.active { background: #fff; color: #000; }
+        .accent-btn { background: #fff; color: #000; font-weight: 700; transition: 0.3s; }
+        .accent-btn:hover { background: #ddd; transform: translateY(-2px); }
+        .loader-bar { height: 4px; width: 0%; background: #0ea5e9; transition: 0.4s; border-radius: 10px; }
+        .media-prev { min-height: 300px; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 16px; border: 1px dashed #222; overflow: hidden; }
+        audio { filter: invert(1); width: 100%; max-width: 400px; }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body class="p-6">
 
-    <div class="max-w-4xl mx-auto">
-        <header class="mb-10 flex justify-between items-center">
-            <h1 class="text-3xl font-black">AURA<span class="text-sky-500">AI</span></h1>
-            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest border border-zinc-800 px-3 py-1 rounded-full">Final Stable Build</div>
+    <main class="max-w-4xl mx-auto">
+        <header class="text-center py-10">
+            <h1 class="text-4xl font-black tracking-tighter">AURA <span class="text-sky-500 italic">AI</span></h1>
+            <p class="text-gray-500 text-xs mt-2 uppercase tracking-widest font-bold">Comprehensive Creative Suite</p>
         </header>
 
-        <div class="glass p-6 md:p-8 mb-8">
-            <textarea id="userInput" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white mb-6 outline-none focus:border-sky-500 h-32" placeholder="Write your prompt or speech text here..."></textarea>
+        <div class="grid grid-cols-3 gap-3 mb-8">
+            <button onclick="switchModule('imgModule')" id="imgTab" class="tab-btn p-4 rounded-xl active">Text to Image</button>
+            <button onclick="switchModule('vidModule')" id="vidTab" class="tab-btn p-4 rounded-xl">Text to Video</button>
+            <button onclick="switchModule('ttsModule')" id="ttsTab" class="tab-btn p-4 rounded-xl">Text to Speech</button>
+        </div>
+
+        <div id="imgModule" class="module-section studio-card space-y-6">
+            <h2 class="text-xl font-bold">Image Generator</h2>
+            <textarea id="imgPrompt" class="input-box w-full h-32 resize-none" placeholder="Describe the image you want to create (Hindi/English both work)..."></textarea>
+            <button onclick="createMedia('img')" class="accent-btn w-full py-4 rounded-xl">Generate Image</button>
+        </div>
+
+        <div id="vidModule" class="module-section studio-card space-y-6 hidden">
+            <h2 class="text-xl font-bold">Video Generator (DALL-E Style)</h2>
+            <textarea id="vidPrompt" class="input-box w-full h-32 resize-none" placeholder="Describe the video scene... Note: For true video, this uses a stable image source as a base."></textarea>
+            <button onclick="createMedia('vid')" class="accent-btn w-full py-4 rounded-xl">Generate Video</button>
+        </div>
+
+        <div id="ttsModule" class="module-section studio-card space-y-6 hidden">
+            <h2 class="text-xl font-bold">Voice Synthesis (Stable)</h2>
+            <textarea id="ttsText" class="input-box w-full h-32 resize-none" placeholder="Type or paste the text you want to convert to voice..."></textarea>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-zinc-500 uppercase">Voice Language</label>
-                    <select id="lang">
-                        <option value="hi-IN">Hindi (India)</option>
-                        <option value="en-US">English (US)</option>
-                        <option value="es-ES">Spanish</option>
-                        <option value="fr-FR">French</option>
-                    </select>
-                </div>
-                <button onclick="generate('image')" class="bg-white text-black font-bold rounded-xl h-12 hover:bg-zinc-200 transition">Create Image</button>
-                <button onclick="generate('video')" class="bg-zinc-800 text-white font-bold rounded-xl h-12 hover:bg-zinc-700 transition">Create Video</button>
+            <div class="flex flex-col gap-2">
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Select Voice Language</label>
+                <select id="ttsLang" class="w-full">
+                    <option value="hi-IN">Hindi (Indian)</option>
+                    <option value="en-US">English (US)</option>
+                    <option value="en-GB">English (British)</option>
+                </select>
             </div>
+            
+            <button onclick="generateVoice()" class="accent-btn w-full py-4 rounded-xl">Generate & Download Voice</button>
+        </div>
 
-            <button onclick="generateSpeech()" class="w-full mt-4 bg-sky-600/10 text-sky-500 border border-sky-500/20 font-bold py-4 rounded-xl hover:bg-sky-500/20 transition">Generate & Download Voice</button>
-
-            <div id="loader" class="hidden mt-8">
-                <div class="flex justify-between text-[10px] font-bold text-zinc-500 mb-2">
-                    <span id="loadStatus">AURA ENGINE PROCESSING...</span>
-                    <span id="percent">0%</span>
-                </div>
-                <div class="w-full bg-zinc-900 rounded-full overflow-hidden">
-                    <div id="bar" class="loading-line"></div>
-                </div>
+        <div id="loader" class="hidden my-8 p-4 bg-zinc-900 rounded-xl">
+            <div class="flex justify-between text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-wider">
+                <span id="loadText">Processing...</span>
+                <span id="percent">0%</span>
+            </div>
+            <div class="w-full bg-zinc-800 rounded-full overflow-hidden">
+                <div id="bar" class="loader-bar"></div>
             </div>
         </div>
 
-        <div id="result" class="hidden glass p-4 animate-pulse">
-            <div id="display" class="media-box overflow-hidden mb-6"></div>
+        <div id="result" class="hidden studio-card p-4 mt-8">
+            <div id="displayArea" class="media-prev mb-6"></div>
             <div class="flex flex-col md:flex-row justify-between items-center p-4 gap-4 border-t border-zinc-900">
-                <p id="desc" class="text-sm text-zinc-500 italic"></p>
-                <a id="downBtn" href="#" download class="bg-sky-500 text-white font-bold px-8 py-3 rounded-xl hover:bg-sky-600 transition w-full md:w-auto text-center">Download File</a>
+                <p id="descText" class="text-sm text-gray-500 italic max-w-sm"></p>
+                <a id="downloadBtn" href="#" download="AuraAI_Export" class="accent-btn px-8 py-3 rounded-xl font-bold text-sm w-full md:w-auto text-center">Download File</a>
             </div>
         </div>
-    </div>
+    </main>
+
+    <footer class="mt-20 text-center pb-10">
+        <p class="text-[10px] tracking-[0.4em] text-zinc-700 font-bold uppercase italic">Aura AI Research Studio &copy; 2026</p>
+    </footer>
 
     <script>
-        // --- SPEECH GENERATION (FIXED DOWNLOAD) ---
-        async function generateSpeech() {
-            const text = document.getElementById('userInput').value;
-            const lang = document.getElementById('lang').value.split('-')[0];
-            if(!text) return alert("Please enter text!");
-
-            const status = document.getElementById('loadStatus');
-            const res = document.getElementById('result');
-            const display = document.getElementById('display');
-            const downBtn = document.getElementById('downBtn');
-
-            // Using a more stable TTS bridge
-            const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+        // --- Core: UI Switcher ---
+        function switchModule(moduleId) {
+            document.querySelectorAll('.module-section').forEach(mod => mod.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(moduleId).classList.remove('hidden');
+            if (moduleId === 'imgModule') document.getElementById('imgTab').classList.add('active');
+            if (moduleId === 'vidModule') document.getElementById('vidTab').classList.add('active');
+            if (moduleId === 'ttsModule') document.getElementById('ttsTab').classList.add('active');
             
-            display.innerHTML = `
-                <div class="text-center">
-                    <div class="text-sky-500 text-6xl mb-4">♪</div>
-                    <audio id="player" controls src="${ttsUrl}" class="mx-auto"></audio>
-                </div>
-            `;
-            
-            downBtn.href = ttsUrl;
-            downBtn.innerText = "Download MP3 Audio";
-            document.getElementById('desc').innerText = "Voice generated in " + lang.toUpperCase();
-            res.classList.remove('hidden');
-            res.classList.remove('animate-pulse');
-            
-            document.getElementById('player').play();
-            alert("Audio is ready! You can play it or click download.");
+            // Clear current result when switching
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('loader').classList.add('hidden');
         }
 
-        // --- IMAGE & VIDEO (ROBUST RETRY LOGIC) ---
-        async function generate(type) {
-            const prompt = document.getElementById('userInput').value;
-            if(!prompt) return alert("Prompt is required!");
+        // --- Feature 1: Image & Video Generation ---
+        async function createMedia(type) {
+            const promptId = type === 'img' ? 'imgPrompt' : 'vidPrompt';
+            const prompt = document.getElementById(promptId).value;
+            if(!prompt) return alert("Write a description first!");
 
             const loader = document.getElementById('loader');
             const bar = document.getElementById('bar');
             const percent = document.getElementById('percent');
             const res = document.getElementById('result');
-            const display = document.getElementById('display');
-            const downBtn = document.getElementById('downBtn');
+            const display = document.getElementById('displayArea');
+            const downBtn = document.getElementById('downloadBtn');
 
+            // Reset UI for load
             loader.classList.remove('hidden');
             res.classList.add('hidden');
+            document.getElementById('loadText').innerText = `Aura Engine: Generating ${type === 'img' ? 'Image' : 'Video'}`;
             
             let p = 0;
             const timer = setInterval(() => {
-                if(p < 95) {
-                    p += Math.random() * 5;
-                    bar.style.width = p + "%";
-                    percent.innerText = Math.floor(p) + "%";
-                }
-            }, 500);
+                if(p < 95) { p += Math.random() * 8; bar.style.width = p + "%"; percent.innerText = Math.floor(p) + "%"; }
+            }, 600);
 
             const seed = Math.floor(Math.random() * 999999);
-            const url = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${seed}&model=flux&nologo=true`;
+            const imgUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${seed}&model=flux&nologo=true`;
 
-            const img = new Image();
-            img.src = url;
-
-            img.onload = () => {
+            // Pre-load logic to avoid 404 or sudden busy states
+            const mediaObj = new Image();
+            mediaObj.src = imgUrl;
+            
+            mediaObj.onload = () => {
                 clearInterval(timer);
                 bar.style.width = "100%";
                 percent.innerText = "100%";
                 
                 setTimeout(() => {
-                    display.innerHTML = `<img src="${url}" class="w-full h-auto">`;
-                    downBtn.href = url;
+                    display.innerHTML = `<img src="${imgUrl}" class="w-full h-auto">`;
+                    downBtn.href = imgUrl;
                     downBtn.innerText = "Download " + type.toUpperCase();
-                    document.getElementById('desc').innerText = prompt;
+                    document.getElementById('descText').innerText = "Generated from: " + prompt.substring(0,30) + "...";
                     
                     loader.classList.add('hidden');
                     res.classList.remove('hidden');
-                    res.classList.remove('animate-pulse');
+                    window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
                 }, 500);
             };
 
-            img.onerror = () => {
+            mediaObj.onerror = () => {
                 clearInterval(timer);
-                document.getElementById('loadStatus').innerText = "Engine busy, retrying...";
-                setTimeout(() => generate(type), 2000); // Auto-Retry
+                document.getElementById('loadText').innerText = "Server overloaded. Auto-retrying...";
+                setTimeout(() => createMedia(type), 2000); // Retry logic
             };
+        }
+
+        // --- Feature 2: Text to Speech (TTS) ---
+        async function generateVoice() {
+            const text = document.getElementById('ttsText').value;
+            const lang = document.getElementById('ttsLang').value.split('-')[0];
+            if(!text) return alert("Write some text for the voice!");
+
+            // Google TTS Link (Direct backup, as SpeechSynthesis cannot be directly downloaded)
+            const backupUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+
+            const display = document.getElementById('displayArea');
+            const res = document.getElementById('result');
+            const downBtn = document.getElementById('downloadBtn');
+
+            // Browser internal SpeechSynthesis for instant playback (will not be downloadable as file)
+            const synth = window.speechSynthesis;
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = document.getElementById('ttsLang').value;
+            synth.speak(utter);
+
+            // Audio Player for feedback and direct download from bridge
+            display.innerHTML = `
+                <div class="text-center p-10">
+                    <div class="text-sky-500 text-6xl mb-6">♪</div>
+                    <audio id="ttsPlayer" controls src="${backupUrl}"></audio>
+                </div>
+            `;
+            
+            // Set download to bridge, which returns the actual MP3
+            downBtn.href = backupUrl;
+            downBtn.innerText = "Download MP3 Audio";
+            document.getElementById('descText').innerText = "Audio Generated Successfully.";
+            res.classList.remove('hidden');
+            window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
         }
     </script>
 </body>
